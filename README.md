@@ -1,63 +1,65 @@
-# Black Wolf ft_irc Tester
+# ft_irc Tester
 
 Terminal tester for the 42 `ft_irc` project.
 
-It can:
+## Setup
 
-- show a Black Wolf ASCII intro
-- launch your `ircserv` binary automatically
-- connect to an already running server
-- run `normal`, `bonus`, or `global` test suites
-- open a raw IRC command terminal for manual testing
-
-## Quick Start
-
-Put the tester beside your `ircserv` binary, then run:
+Copy your compiled server binary into this tester directory and make sure it is named `ircserv`:
 
 ```sh
-python3 scripts/test_irc.py
+cp /path/to/your/ft_irc/ircserv ./ircserv
 ```
 
-The default command expects:
+The tester expects this by default:
 
 - binary: `./ircserv`
 - host: `127.0.0.1`
 - port: `6667`
 - password: `mypass`
 
-## Common Commands
+## Run
 
-Run mandatory tests:
-
-```sh
-python3 scripts/test_irc.py --mode normal --binary ./ircserv --port 6667 --password mypass
-```
-
-Run bonus tests:
+Run the full tester:
 
 ```sh
-python3 scripts/test_irc.py --mode bonus --binary ./ircserv --port 6667 --password mypass
+make
 ```
 
-Run the full global tester:
+That starts:
 
 ```sh
-python3 scripts/test_irc.py --mode global --binary ./ircserv --port 6667 --password mypass
+./ircserv 6667 mypass
 ```
 
-Test a server that is already running:
+Then it runs the global test suite.
+
+## Other Modes
+
+Mandatory tests only:
 
 ```sh
-python3 scripts/test_irc.py --no-start --host 127.0.0.1 --port 6667 --password mypass --mode global
+make normal
 ```
 
-Open a raw IRC terminal:
+Bonus tests only:
 
 ```sh
-python3 scripts/test_irc.py --mode terminal --no-start --host 127.0.0.1 --port 6667 --password mypass
+make bonus
 ```
 
-Inside the terminal, type IRC commands like:
+Global tests:
+
+```sh
+make global
+```
+
+Manual IRC terminal:
+
+```sh
+make terminal
+```
+
+Inside the terminal, you can type raw IRC commands:
 
 ```irc
 JOIN #test
@@ -68,32 +70,29 @@ TOPIC #test :new topic
 
 Use `/quit` to leave the tester terminal.
 
-## Bonus Bot Test
-
-If your bonus includes a bot, pass its nick:
+## Change Port Or Password
 
 ```sh
-python3 scripts/test_irc.py --mode bonus --bot-nick mybot
+make PORT=4242 PASSWORD=secret
 ```
 
-The tester sends `!help` to the bot and checks for a `PRIVMSG` or `NOTICE`
-reply.
-
-## Environment Variables
-
-You can configure defaults with:
+Use another binary path:
 
 ```sh
-export IRC_TEST_HOST=127.0.0.1
-export IRC_TEST_PORT=6667
-export IRC_TEST_PASSWORD=mypass
-export IRC_TEST_BINARY=./ircserv
-export IRC_TEST_TIMEOUT=4
-export IRC_TEST_BOT_NICK=mybot
+make BINARY=/path/to/ircserv
 ```
 
-Then run:
+Test a server that is already running:
 
 ```sh
-python3 scripts/test_irc.py --mode global
+make external PORT=4242 PASSWORD=secret
 ```
+
+If your bonus includes a bot:
+
+```sh
+make bonus BOT_NICK=mybot
+```
+
+
+Created and owned by Black Wolf.

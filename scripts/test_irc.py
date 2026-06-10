@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Black Wolf ft_irc tester.
+ft_irc tester.
 
 A clone-friendly terminal tester for 42 ft_irc projects. It can launch a local
 ircserv binary or connect to an already running server, then run normal, bonus,
@@ -41,70 +41,14 @@ GREEN = "\033[32m"
 RED = "\033[31m"
 YELLOW = "\033[33m"
 CYAN = "\033[36m"
-BLUE = "\033[34m"
 MAGENTA = "\033[35m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
 
 
-BLACK_WOLF = r"""
-                  __
-               .-'  `-.
-          _.-'          `-._
-        .'    /\      /\    `.
-       /     /  \____/  \     \
-      ;     /  _      _  \     ;
-      |    |  (o)    (o)  |    |
-      ;    |      __      |    ;
-       \   \   .-"  "-.   /   /
-        `.  `._\______/_.`  .'
-          `-._   BLACK   _.-'
-              `-. WOLF .-'
-                 `----`
-"""
-
-TITLE = r"""
- ____  _            _       __        __    _  __
-| __ )| | __ _  ___| | __   \ \      / /__ | |/ _|
-|  _ \| |/ _` |/ __| |/ /    \ \ /\ / / _ \| | |_
-| |_) | | (_| | (__|   <      \ V  V / (_) | |  _|
-|____/|_|\__,_|\___|_|\_\      \_/\_/ \___/|_|_|
-"""
-
-
-def color(enabled, value):
-    return value if enabled else ""
-
-
-def slow_print(text, delay=0.006, enabled=True):
-    if not enabled:
-        print(text)
-        return
-    for ch in text:
-        print(ch, end="", flush=True)
-        if ch != "\n":
-            time.sleep(delay)
-    print()
-
-
-def intro(args):
-    if args.no_intro:
-        return
-    os.system("clear" if os.name == "posix" else "cls")
-    print(f"{BOLD}{BLUE}{BLACK_WOLF}{RESET}")
-    slow_print(f"{BOLD}{TITLE}{RESET}", 0.0015, not args.fast)
-    slow_print(
-        f"{CYAN}ft_irc tester for mandatory, bonus, global, and raw terminal checks.{RESET}",
-        0.01,
-        not args.fast,
-    )
-    if not args.fast:
-        time.sleep(0.35)
-
-
 def banner(args):
-    print(f"\n{BOLD}Black Wolf ft_irc tester{RESET}")
+    print(f"\n{BOLD}ft_irc tester{RESET}")
     print(f"  Binary : {args.binary}")
     print(f"  Address: {args.host}:{args.port}")
     print(f"  Password: {args.password}")
@@ -1044,7 +988,7 @@ def suite_for_mode(mode):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Black Wolf terminal tester for 42 ft_irc servers.",
+        description="Terminal tester for 42 ft_irc servers.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--host", default=HOST, help="IRC server host")
@@ -1054,8 +998,6 @@ def parse_args():
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="Read timeout in seconds")
     parser.add_argument("--mode", choices=("menu", "normal", "bonus", "global", "terminal"), default="menu", help="Tester mode")
     parser.add_argument("--no-start", action="store_true", help="Connect to an already running server")
-    parser.add_argument("--no-intro", action="store_true", help="Skip the Black Wolf intro")
-    parser.add_argument("--fast", action="store_true", help="Speed up the intro animation")
     parser.add_argument("--clients", type=int, default=12, help="Client count for global load test")
     parser.add_argument("--bot-nick", default=os.getenv("IRC_TEST_BOT_NICK"), help="Optional bot nick for bonus bot test")
     return parser.parse_args()
@@ -1064,7 +1006,6 @@ def parse_args():
 def main():
     args = parse_args()
     apply_args(args)
-    intro(args)
     banner(args)
 
     srv = start_server()
