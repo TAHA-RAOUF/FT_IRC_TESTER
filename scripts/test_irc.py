@@ -41,22 +41,75 @@ GREEN = "\033[32m"
 RED = "\033[31m"
 YELLOW = "\033[33m"
 CYAN = "\033[36m"
+BLUE = "\033[34m"
 MAGENTA = "\033[35m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
 
 
+BLACK_WOLF = r"""
+                    /\
+                   /  \
+              /\  / /\ \  /\
+             /  \/ /  \ \/  \
+            / /\  /____\  /\ \
+           / /  \  .--.  /  \ \
+          /_/    \( oo )/    \_\
+                  | __ |
+               ___\____/___
+             .'            `.
+            /   BLACK WOLF   \
+            \__  FT_IRC TEST _/
+               `-._______.-'
+"""
+
+
+def slow_print(text, delay=0.002, enabled=True):
+    if not enabled:
+        print(text)
+        return
+    for ch in text:
+        print(ch, end="", flush=True)
+        if ch != "\n":
+            time.sleep(delay)
+    print()
+
+
+def clear_screen():
+    if sys.stdout.isatty():
+        os.system("clear" if os.name == "posix" else "cls")
+
+
+def intro(args):
+    if args.no_intro:
+        return
+    clear_screen()
+    print(f"{BOLD}{BLUE}{BLACK_WOLF}{RESET}")
+    slow_print(
+        f"{BOLD}{CYAN}A terminal tester for 42 ft_irc servers.{RESET}",
+        enabled=not args.fast,
+    )
+    if not args.fast:
+        time.sleep(0.25)
+
+
+def rule(color=CYAN):
+    print(f"{color}{'-' * 58}{RESET}")
+
+
 def banner(args):
-    print(f"\n{BOLD}ft_irc tester{RESET}")
-    print(f"  Binary : {args.binary}")
-    print(f"  Address: {args.host}:{args.port}")
-    print(f"  Password: {args.password}")
-    print(f"  Start server: {'no, external mode' if args.no_start else 'yes'}\n")
+    rule(MAGENTA)
+    print(f"{BOLD}ft_irc tester{RESET}")
+    print(f"{DIM}binary{RESET}   {args.binary}")
+    print(f"{DIM}server{RESET}   {args.host}:{args.port}")
+    print(f"{DIM}password{RESET} {args.password}")
+    print(f"{DIM}mode{RESET}     {'external server' if args.no_start else 'launch ./ircserv'}")
+    rule(MAGENTA)
 
 
 def section(title):
-    print(f"\n{BOLD}{CYAN}== {title} =={RESET}")
+    print(f"\n{BOLD}{CYAN}[ {title} ]{RESET}")
 
 
 def result(name, ok, detail=""):
@@ -912,12 +965,14 @@ def run_suite(name, tests):
 
 def print_summary():
     total = PASS + FAIL + SKIP
-    print(f"\n{BOLD}--------------------------------------{RESET}")
+    print()
+    rule(MAGENTA)
     print(f"  Results: {GREEN}{PASS} passed{RESET} / {RED}{FAIL} failed{RESET} / {YELLOW}{SKIP} skipped{RESET} / {total} total")
     if FAIL == 0:
         print(f"  {GREEN}{BOLD}Suite finished cleanly.{RESET}")
     else:
         print(f"  {RED}{BOLD}{FAIL} test(s) failed.{RESET}")
+    rule(MAGENTA)
 
 
 def raw_terminal():
@@ -955,13 +1010,14 @@ def raw_terminal():
 
 
 def choose_mode():
-    print(f"{BOLD}Choose a mode:{RESET}")
-    print("  1) normal  - mandatory ft_irc checks")
-    print("  2) bonus   - DCC relay and optional bot hook")
-    print("  3) global  - normal + bonus + stress/regression checks")
-    print("  4) terminal - manual IRC command terminal")
-    print("  5) quit")
-    answer = input("\nMode [1]: ").strip().lower() or "1"
+    print()
+    print(f"{BOLD}{CYAN}Choose test mode{RESET}")
+    print(f"  {GREEN}1{RESET}  normal    mandatory ft_irc checks")
+    print(f"  {GREEN}2{RESET}  bonus     DCC relay and optional bot hook")
+    print(f"  {GREEN}3{RESET}  global    normal + bonus + stress/regression checks")
+    print(f"  {GREEN}4{RESET}  terminal  manual IRC command terminal")
+    print(f"  {GREEN}5{RESET}  quit")
+    answer = input(f"\n{BOLD}Select [1]: {RESET}").strip().lower() or "1"
     return {
         "1": "normal",
         "normal": "normal",
@@ -998,6 +1054,8 @@ def parse_args():
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="Read timeout in seconds")
     parser.add_argument("--mode", choices=("menu", "normal", "bonus", "global", "terminal"), default="menu", help="Tester mode")
     parser.add_argument("--no-start", action="store_true", help="Connect to an already running server")
+    parser.add_argument("--no-intro", action="store_true", help="Skip the ASCII intro")
+    parser.add_argument("--fast", action="store_true", help="Speed up the ASCII intro")
     parser.add_argument("--clients", type=int, default=12, help="Client count for global load test")
     parser.add_argument("--bot-nick", default=os.getenv("IRC_TEST_BOT_NICK"), help="Optional bot nick for bonus bot test")
     return parser.parse_args()
@@ -1006,14 +1064,16 @@ def parse_args():
 def main():
     args = parse_args()
     apply_args(args)
+    intro(args)
     banner(args)
 
-    srv = start_server()
     exit_ok = True
+    srv = None
     try:
         mode = choose_mode() if args.mode == "menu" else args.mode
         if mode == "quit":
             return
+        srv = start_server()
         if mode == "terminal":
             raw_terminal()
             return

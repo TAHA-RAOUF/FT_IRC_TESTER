@@ -19,19 +19,29 @@ The tester expects this by default:
 
 ## Run
 
-Run the full tester:
+Start the tester:
 
 ```sh
 make
 ```
 
-That starts:
+This shows the ASCII intro and opens the terminal menu:
+
+```text
+1  normal    mandatory ft_irc checks
+2  bonus     DCC relay and optional bot hook
+3  global    normal + bonus + stress/regression checks
+4  terminal  manual IRC command terminal
+5  quit
+```
+
+When you choose a test mode, the tester starts:
 
 ```sh
 ./ircserv 6667 mypass
 ```
 
-Then it runs the global test suite.
+Then it runs the selected suite.
 
 ## Other Modes
 
